@@ -2,16 +2,26 @@ function json(response, status, body) {
   response.status(status).json(body);
 }
 
-async function fetchEntries() {
+function getSupabaseRestUrl() {
   const supabaseUrl = process.env.SUPABASE_URL;
+
+  if (!supabaseUrl) {
+    return "";
+  }
+
+  return supabaseUrl.replace(/\/rest\/v1\/?$/, "").replace(/\/$/, "") + "/rest/v1";
+}
+
+async function fetchEntries() {
+  const supabaseRestUrl = getSupabaseRestUrl();
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!supabaseUrl || !serviceKey) {
-    throw new Error("Supabase 환경변수가 설정되지 않았습니다.");
+  if (!supabaseRestUrl || !serviceKey) {
+    throw new Error("Supabase environment variables are not configured.");
   }
 
   const response = await fetch(
-    `${supabaseUrl}/rest/v1/quiz_entries?select=chosen_number,score,created_at&order=created_at.desc`,
+    `${supabaseRestUrl}/quiz_entries?select=chosen_number,score,created_at&order=created_at.desc`,
     {
       headers: {
         apikey: serviceKey,
@@ -23,7 +33,7 @@ async function fetchEntries() {
   const text = await response.text();
 
   if (!response.ok) {
-    throw new Error(text || "Supabase 조회에 실패했습니다.");
+    throw new Error(text || "Failed to fetch entries from Supabase.");
   }
 
   return JSON.parse(text);
@@ -31,15 +41,15 @@ async function fetchEntries() {
 
 module.exports = async function handler(request, response) {
   if (request.method !== "POST") {
-    return json(response, 405, { error: "POST 요청만 사용할 수 있습니다." });
+    return json(response, 405, { error: "Only POST requests are allowed." });
   }
 
   if (!process.env.ADMIN_PASSWORD) {
-    return json(response, 500, { error: "관리자 비밀번호 환경변수가 설정되지 않았습니다." });
+    return json(response, 500, { error: "ADMIN_PASSWORD is not configured." });
   }
 
   if ((request.body || {}).password !== process.env.ADMIN_PASSWORD) {
-    return json(response, 401, { error: "관리자 비밀번호가 올바르지 않습니다." });
+    return json(response, 401, { error: "Admin password is incorrect." });
   }
 
   try {
