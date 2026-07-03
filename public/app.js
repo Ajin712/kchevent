@@ -1,52 +1,52 @@
 const questions = [
   {
     id: "q1",
-    text: "대한민국의 수도는 어디인가요?",
+    text: "다음 중 컴공 졸업 후 진출 분야가 아닌 것은?",
     choices: [
       { id: "a", label: "부산" },
-      { id: "b", label: "서울" },
+      { id: "b", label: "답번호" },
       { id: "c", label: "대구" },
       { id: "d", label: "광주" }
     ]
   },
   {
     id: "q2",
-    text: "물의 화학식은 무엇인가요?",
+    text: "다음 중 컴공 진학이 추천되지 않는 사람은?",
     choices: [
       { id: "a", label: "CO2" },
       { id: "b", label: "O2" },
-      { id: "c", label: "H2O" },
+      { id: "c", label: "답번호" },
       { id: "d", label: "NaCl" }
     ]
   },
   {
     id: "q3",
-    text: "1년은 보통 몇 개월인가요?",
+    text: "충남대 컴공 주요 행사로 옳지 않은 것은?",
     choices: [
       { id: "a", label: "10개월" },
       { id: "b", label: "11개월" },
-      { id: "c", label: "12개월" },
+      { id: "c", label: "답번호" },
       { id: "d", label: "13개월" }
     ]
   },
   {
     id: "q4",
-    text: "다음 중 가장 큰 수는 무엇인가요?",
+    text: "답 찍을 때 몇 번으로 찍는 게 가장 좋을까요?",
     choices: [
-      { id: "a", label: "18" },
-      { id: "b", label: "42" },
-      { id: "c", label: "27" },
-      { id: "d", label: "9" }
+      { id: "a", label: "2" },
+      { id: "b", label: "3" },
+      { id: "c", label: "4" },
+      { id: "d", label: "5" }
     ]
   },
   {
     id: "q5",
-    text: "HTML은 주로 무엇을 만드는 데 사용되나요?",
+    text: "다음 중 알고리즘 찍먹으로 추천되지 않은 것은?",
     choices: [
-      { id: "a", label: "웹페이지 구조" },
-      { id: "b", label: "자동차 엔진" },
-      { id: "c", label: "전기 회로" },
-      { id: "d", label: "음식 조리" }
+      { id: "a", label: "백준" },
+      { id: "b", label: "코드 트리" },
+      { id: "c", label: "비버 챌린지" },
+      { id: "d", label: "프로그래머스" }
     ]
   }
 ];
