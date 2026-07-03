@@ -13,6 +13,16 @@ function json(response, status, body) {
   response.status(status).json(body);
 }
 
+function getSupabaseRestUrl() {
+  const supabaseUrl = process.env.SUPABASE_URL;
+
+  if (!supabaseUrl) {
+    return "";
+  }
+
+  return supabaseUrl.replace(/\/rest\/v1\/?$/, "").replace(/\/$/, "") + "/rest/v1";
+}
+
 function scoreAnswers(answers = {}) {
   return Object.entries(ANSWER_KEY).reduce((score, [questionId, correctChoice]) => {
     return score + (answers[questionId] === correctChoice ? 1 : 0);
@@ -20,14 +30,14 @@ function scoreAnswers(answers = {}) {
 }
 
 async function insertEntry(chosenNumber, score) {
-  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseRestUrl = getSupabaseRestUrl();
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!supabaseUrl || !serviceKey) {
-    throw new Error("Supabase 환경변수가 설정되지 않았습니다.");
+  if (!supabaseRestUrl || !serviceKey) {
+    throw new Error("Supabase environment variables are not configured.");
   }
 
-  const response = await fetch(`${supabaseUrl}/rest/v1/quiz_entries`, {
+  const response = await fetch(`${supabaseRestUrl}/quiz_entries`, {
     method: "POST",
     headers: {
       apikey: serviceKey,
@@ -48,7 +58,7 @@ async function insertEntry(chosenNumber, score) {
   const text = await response.text();
 
   if (!response.ok) {
-    throw new Error(text || "Supabase 저장에 실패했습니다.");
+    throw new Error(text || "Failed to save entry to Supabase.");
   }
 
   return { entry: JSON.parse(text)[0] };
@@ -56,7 +66,7 @@ async function insertEntry(chosenNumber, score) {
 
 module.exports = async function handler(request, response) {
   if (request.method !== "POST") {
-    return json(response, 405, { error: "POST 요청만 사용할 수 있습니다." });
+    return json(response, 405, { error: "Only POST requests are allowed." });
   }
 
   const { answers, chosenNumber, dryRun } = request.body || {};
@@ -68,18 +78,24 @@ module.exports = async function handler(request, response) {
   }
 
   if (!passed) {
-    return json(response, 403, { error: "3개 이상 맞혀야 번호를 등록할 수 있습니다.", score, passed });
+    return json(response, 403, {
+      error: "You need at least 3 correct answers to register a number.",
+      score,
+      passed
+    });
   }
 
   if (!NUMBER_PATTERN.test(String(chosenNumber || ""))) {
-    return json(response, 400, { error: "번호는 1~4자리 숫자로 입력해 주세요." });
+    return json(response, 400, { error: "Enter a number with 1 to 4 digits." });
   }
 
   try {
     const result = await insertEntry(String(chosenNumber), score);
 
     if (result.duplicate) {
-      return json(response, 409, { error: "이미 사용된 번호입니다. 다른 번호를 입력해 주세요." });
+      return json(response, 409, {
+        error: "This number is already registered. Please choose another one."
+      });
     }
 
     return json(response, 200, {
