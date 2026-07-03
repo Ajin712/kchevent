@@ -1,0 +1,181 @@
+const questions = [
+  {
+    id: "q1",
+    text: "대한민국의 수도는 어디인가요?",
+    choices: [
+      { id: "a", label: "부산" },
+      { id: "b", label: "서울" },
+      { id: "c", label: "대구" },
+      { id: "d", label: "광주" }
+    ]
+  },
+  {
+    id: "q2",
+    text: "물의 화학식은 무엇인가요?",
+    choices: [
+      { id: "a", label: "CO2" },
+      { id: "b", label: "O2" },
+      { id: "c", label: "H2O" },
+      { id: "d", label: "NaCl" }
+    ]
+  },
+  {
+    id: "q3",
+    text: "1년은 보통 몇 개월인가요?",
+    choices: [
+      { id: "a", label: "10개월" },
+      { id: "b", label: "11개월" },
+      { id: "c", label: "12개월" },
+      { id: "d", label: "13개월" }
+    ]
+  },
+  {
+    id: "q4",
+    text: "다음 중 가장 큰 수는 무엇인가요?",
+    choices: [
+      { id: "a", label: "18" },
+      { id: "b", label: "42" },
+      { id: "c", label: "27" },
+      { id: "d", label: "9" }
+    ]
+  },
+  {
+    id: "q5",
+    text: "HTML은 주로 무엇을 만드는 데 사용되나요?",
+    choices: [
+      { id: "a", label: "웹페이지 구조" },
+      { id: "b", label: "자동차 엔진" },
+      { id: "c", label: "전기 회로" },
+      { id: "d", label: "음식 조리" }
+    ]
+  }
+];
+
+const state = {
+  index: 0,
+  answers: {}
+};
+
+const quizPanel = document.querySelector("#quizPanel");
+const resultPanel = document.querySelector("#resultPanel");
+const progressText = document.querySelector("#progressText");
+const questionText = document.querySelector("#questionText");
+const choices = document.querySelector("#choices");
+const prevButton = document.querySelector("#prevButton");
+const nextButton = document.querySelector("#nextButton");
+const scoreText = document.querySelector("#scoreText");
+const resultTitle = document.querySelector("#resultTitle");
+const resultMessage = document.querySelector("#resultMessage");
+const numberForm = document.querySelector("#numberForm");
+const chosenNumber = document.querySelector("#chosenNumber");
+const statusText = document.querySelector("#statusText");
+const restartButton = document.querySelector("#restartButton");
+
+function renderQuestion() {
+  const question = questions[state.index];
+  progressText.textContent = `${state.index + 1} / ${questions.length}`;
+  questionText.textContent = question.text;
+  choices.replaceChildren();
+
+  question.choices.forEach((choice) => {
+    const button = document.createElement("button");
+    button.className = "choice";
+    button.type = "button";
+    button.textContent = choice.label;
+    button.dataset.selected = state.answers[question.id] === choice.id;
+    button.addEventListener("click", () => {
+      state.answers[question.id] = choice.id;
+      renderQuestion();
+    });
+    choices.append(button);
+  });
+
+  prevButton.disabled = state.index === 0;
+  nextButton.disabled = !state.answers[question.id];
+  nextButton.textContent = state.index === questions.length - 1 ? "결과 보기" : "다음";
+}
+
+async function showResult() {
+  quizPanel.classList.add("hidden");
+  resultPanel.classList.remove("hidden");
+  statusText.textContent = "점수를 확인하는 중입니다...";
+
+  try {
+    const response = await fetch("/api/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ answers: state.answers, dryRun: true })
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "점수를 확인하지 못했습니다.");
+    }
+
+    scoreText.textContent = `${data.score} / ${questions.length}`;
+    resultTitle.textContent = data.passed ? "번호 등록 가능" : "아쉽지만 등록 기준 미달";
+    resultMessage.textContent = data.passed
+      ? "3개 이상 맞혔습니다. 원하는 번호를 입력해 주세요."
+      : "3개 이상 맞혀야 번호를 등록할 수 있습니다.";
+    numberForm.classList.toggle("hidden", !data.passed);
+    statusText.textContent = "";
+  } catch (error) {
+    resultTitle.textContent = "확인 실패";
+    resultMessage.textContent = "잠시 후 다시 시도해 주세요.";
+    statusText.textContent = error.message;
+  }
+}
+
+nextButton.addEventListener("click", () => {
+  if (state.index < questions.length - 1) {
+    state.index += 1;
+    renderQuestion();
+    return;
+  }
+
+  showResult();
+});
+
+prevButton.addEventListener("click", () => {
+  state.index = Math.max(0, state.index - 1);
+  renderQuestion();
+});
+
+numberForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  statusText.textContent = "등록 중입니다...";
+
+  try {
+    const response = await fetch("/api/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        answers: state.answers,
+        chosenNumber: chosenNumber.value.trim()
+      })
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "등록하지 못했습니다.");
+    }
+
+    numberForm.classList.add("hidden");
+    statusText.textContent = `${data.chosenNumber}번 등록이 완료되었습니다.`;
+  } catch (error) {
+    statusText.textContent = error.message;
+  }
+});
+
+restartButton.addEventListener("click", () => {
+  state.index = 0;
+  state.answers = {};
+  chosenNumber.value = "";
+  statusText.textContent = "";
+  numberForm.classList.add("hidden");
+  resultPanel.classList.add("hidden");
+  quizPanel.classList.remove("hidden");
+  renderQuestion();
+});
+
+renderQuestion();

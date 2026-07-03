@@ -1,0 +1,15 @@
+{
+  "name": "quiz-number-event",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "vercel dev"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "vercel": "^44.7.3"
+  }
+}

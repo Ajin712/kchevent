@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>퀴즈 이벤트 관리자</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="admin-shell">
+      <section class="panel admin-panel">
+        <div class="topline">
+          <span>관리자</span>
+          <span id="countText">등록 0건</span>
+        </div>
+
+        <h1>등록 번호 목록</h1>
+
+        <form class="admin-login" id="adminForm">
+          <label for="adminPassword">관리자 비밀번호</label>
+          <div class="inline-field">
+            <input id="adminPassword" type="password" autocomplete="current-password" required />
+            <button type="submit">조회</button>
+          </div>
+        </form>
+
+        <div class="admin-tools hidden" id="adminTools">
+          <button class="ghost" id="refreshButton" type="button">새로고침</button>
+          <button id="csvButton" type="button">CSV 다운로드</button>
+        </div>
+
+        <p class="status" id="adminStatus" role="status"></p>
+
+        <div class="table-wrap hidden" id="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>번호</th>
+                <th>점수</th>
+                <th>등록 시간</th>
+              </tr>
+            </thead>
+            <tbody id="entryRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="/admin.js" type="module"></script>
+  </body>
+</html>
