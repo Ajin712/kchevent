@@ -1,32 +1,32 @@
 const questions = [
   {
     id: "q1",
-    text: "다음 중 컴공 졸업 후 진출 분야가 아닌 것은?",
+    text: "다음 중 컴공 졸업 후 대표적인 진출 분야가 아닌 것은?",
     choices: [
-      { id: "a", label: "부산" },
-      { id: "b", label: "답번호" },
-      { id: "c", label: "대구" },
-      { id: "d", label: "광주" }
+      { id: "a", label: "컴퓨터 비전" },
+      { id: "b", label: "프로게이머" },
+      { id: "c", label: "정보보안" },
+      { id: "d", label: "핀테크" }
     ]
   },
   {
     id: "q2",
     text: "다음 중 컴공 진학이 추천되지 않는 사람은?",
     choices: [
-      { id: "a", label: "CO2" },
-      { id: "b", label: "O2" },
-      { id: "c", label: "답번호" },
-      { id: "d", label: "NaCl" }
+      { id: "a", label: "컴퓨터/코딩/알고리즘을 좋아하는 사람" },
+      { id: "b", label: "수학을 잘하는 사람" },
+      { id: "c", label: "그냥 컴공이 멋져 보이는 사람" },
+      { id: "d", label: "게임 만드는 걸 좋아하는 사람" }
     ]
   },
   {
     id: "q3",
     text: "충남대 컴공 주요 행사로 옳지 않은 것은?",
     choices: [
-      { id: "a", label: "10개월" },
-      { id: "b", label: "11개월" },
-      { id: "c", label: "답번호" },
-      { id: "d", label: "13개월" }
+      { id: "a", label: "모각코" },
+      { id: "b", label: "카테캠" },
+      { id: "c", label: "NYPC" },
+      { id: "d", label: "아나겟돈" }
     ]
   },
   {
